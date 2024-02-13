@@ -3,7 +3,9 @@ package main
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -35,14 +37,16 @@ func main() {
 
 	f, err := os.Create(filename)
 	if err != nil {
-		log.Fatalln("error opening file: err:", err)
+		fmt.Println("error opening file: err:", err)
 		os.Exit(1)
 	}
 
 	client := openai.NewClient(apiKey)
+	ctx := context.Background()
 
 	var request = openai.ChatCompletionRequest{
-		Model: openai.GPT3Dot5Turbo,
+		Model:  openai.GPT4TurboPreview,
+		Stream: true,
 	}
 
 	var newMessage = openai.ChatCompletionMessage{
@@ -94,21 +98,38 @@ mainLoop:
 		newMessage.Content = strings.Join(inputLines, " ")
 		request.Messages = append(request.Messages, newMessage)
 
-		resp, err := client.CreateChatCompletion(
-			context.Background(),
+		stream, err := client.CreateChatCompletionStream(
+			ctx,
 			request,
 		)
 
 		if err != nil {
 			return
 		}
+		defer stream.Close()
 
-		fmt.Println("\nChatGPT: " + resp.Choices[0].Message.Content)
+		fmt.Println("\nChatGPT: ")
+		f.WriteString("\nChatGPT: ")
+		msg := ""
+		for {
+			resp, err := stream.Recv()
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			if err != nil {
+				fmt.Printf("\nStream error: %v\n", err)
+				break
+			}
+			msg += resp.Choices[0].Delta.Content
+			fmt.Printf(resp.Choices[0].Delta.Content)
+			f.WriteString(resp.Choices[0].Delta.Content)
+		}
 		fmt.Println("\n")
-		f.WriteString("\nChatGPT: " + resp.Choices[0].Message.Content + "\n")
-
-		request.Messages = append(request.Messages, resp.Choices[0].Message)
-
+		f.WriteString("\n")
+		request.Messages = append(request.Messages, openai.ChatCompletionMessage{
+			Role:    openai.ChatMessageRoleSystem,
+			Content: msg,
+		})
 	}
 
 	defer f.Close()
