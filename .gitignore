@@ -22,3 +22,4 @@ go.work
 
 chat
 *.txt
+config.yaml
