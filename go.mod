@@ -1,13 +1,13 @@
 module kelsey.dev/kelsey/chat
 
-go 1.22.3
+go 1.25.0
 
 require (
 	github.com/MichaelMure/go-term-markdown v0.1.4
 	github.com/joho/godotenv v1.5.1
 	github.com/sashabaranov/go-openai v1.31.0
 	github.com/spf13/viper v1.19.0
-	golang.org/x/crypto v0.27.0
+	golang.org/x/crypto v0.52.0
 )
 
 require (
@@ -39,10 +39,10 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0 // indirect
 	golang.org/x/image v0.20.0 // indirect
-	golang.org/x/net v0.29.0 // indirect
-	golang.org/x/sys v0.25.0 // indirect
-	golang.org/x/term v0.24.0 // indirect
-	golang.org/x/text v0.18.0 // indirect
+	golang.org/x/net v0.54.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/term v0.43.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
